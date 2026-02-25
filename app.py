@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from database import db, ChatStats, Organization, FAQ, Admin
+from database import db, ChatStats, Organization, FAQ, Admin   # models import silindi
 from nlp_engine import ASANAIAssistant
 from datetime import datetime
 import os
