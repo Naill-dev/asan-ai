@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ İdarəetmə - ASAN AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Eyni dashboard.css-dəki stillər, əlavə olaraq: */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #4a90e2;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #357abd;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+        }
+        .modal-header {
+            margin-bottom: 20px;
+        }
+        .modal-header h3 {
+            color: #333;
+        }
+        .modal-body .form-group {
+            margin-bottom: 15px;
+        }
+        .modal-body label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        .modal-body input, .modal-body textarea, .modal-body select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-right: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar (eyni dashboard.html-dəki kimi) -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>ASAN AI Admin</h2>
+            <p>Könüllü: {{ current_user.username }}</p>
+        </div>
+        <div class="sidebar-menu">
+            <a href="{{ url_for('admin_dashboard') }}" class="menu-item">
+                <i class="fas fa-dashboard"></i> Dashboard
+            </a>
+            <a href="{{ url_for('manage_faqs') }}" class="menu-item active">
+                <i class="fas fa-question-circle"></i> FAQ-lar
+            </a>
+            <a href="{{ url_for('view_stats') }}" class="menu-item">
+                <i class="fas fa-chart-bar"></i> Statistika
+            </a>
+            <a href="{{ url_for('admin_logout') }}" class="menu-item logout">
+                <i class="fas fa-sign-out-alt"></i> Çıxış
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>FAQ İdarəetmə</h1>
+            <button class="btn btn-primary" onclick="openAddModal()">
+                <i class="fas fa-plus"></i> Yeni FAQ
+            </button>
+        </div>
+
+        <!-- FAQ Table -->
+        <div class="card">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Sual</th>
+                        <th>Cavab (qısa)</th>
+                        <th>Kateqoriya</th>
+                        <th>Açar sözlər</th>
+                        <th>Hit sayı</th>
+                        <th>Əməliyyatlar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for faq in faqs %}
+                    <tr>
+                        <td>{{ faq.id }}</td>
+                        <td>{{ faq.question[:50] }}{% if faq.question|length > 50 %}...{% endif %}</td>
+                        <td>{{ faq.answer[:50] }}{% if faq.answer|length > 50 %}...{% endif %}</td>
+                        <td><span class="badge">{{ faq.category }}</span></td>
+                        <td>
+                            {% for kw in faq.get_keywords() %}
+                            <span class="badge">{{ kw }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>{{ faq.hit_count }}</td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-primary" onclick="editFaq({{ faq.id }})">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{{ url_for('delete_faq', faq_id=faq.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Silmək istədiyinizə əminsiniz?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align: center;">Heç bir FAQ əlavə edilməyib</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="faqModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Yeni FAQ əlavə et</h3>
+            </div>
+            <form method="POST" action="{{ url_for('add_faq') }}" id="faqForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Sual</label>
+                        <input type="text" name="question" id="faqQuestion" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Cavab</label>
+                        <textarea name="answer" id="faqAnswer" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Açar sözlər (vergüllə ayırın)</label>
+                        <input type="text" name="keywords" id="faqKeywords" placeholder="məsələn: doğum, şəhadətnamə, uşaq">
+                    </div>
+                    <div class="form-group">
+                        <label>Kateqoriya</label>
+                        <select name="category" id="faqCategory">
+                            <option value="sənəd">Sənəd</option>
+                            <option value="təcili">Təcili</option>
+                            <option value="ümumi">Ümumi</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" onclick="closeModal()">Ləğv et</button>
+                    <button type="submit" class="btn btn-primary">Yadda saxla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        const modal = document.getElementById('faqModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const faqForm = document.getElementById('faqForm');
+
+        function openAddModal() {
+            modalTitle.innerText = 'Yeni FAQ əlavə et';
+            document.getElementById('faqQuestion').value = '';
+            document.getElementById('faqAnswer').value = '';
+            document.getElementById('faqKeywords').value = '';
+            document.getElementById('faqCategory').value = 'sənəd';
+            faqForm.action = "{{ url_for('add_faq') }}";
+            modal.style.display = 'flex';
+        }
+
+        function editFaq(id) {
+            // Burada AJAX ilə məlumatları yükləmək olar, sadəlik üçün hələlik xəbərdarlıq
+            alert('Edit funksiyası hazırlanır. İndilik JSON faylından əl ilə düzəliş edin.');
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
