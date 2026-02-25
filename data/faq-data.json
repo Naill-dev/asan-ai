@@ -1,0 +1,50 @@
+{
+    "asan_xidmet": [
+        {
+            "question": "Doğum haqqında şəhadətnaməni necə ala bilərəm?",
+            "answer": "Doğum haqqında şəhadətnamə almaq üçün:\n- Valideynlərin şəxsiyyət vəsiqəsi\n- Doğum haqqında tibbi arayış\n- Ərizə (ASAN-da doldurulur)\nDövlət rüsumu: 3 AZN",
+            "keywords": ["doğum", "körpə", "şəhadətnamə", "uşaq"],
+            "category": "sənəd"
+        },
+        {
+            "question": "Şəxsiyyət vəsiqəmi itirmişəm, nə etməliyəm?",
+            "answer": "Şəxsiyyət vəsiqəsini itirdikdə:\n1. Daxili İşlər Nazirliyindən arayış alın\n2. ASAN xidmətə müraciət edin\n3. 2 ədəd foto (3x4)\n4. Rüsum: 8 AZN\nMüddət: 5 iş günü",
+            "keywords": ["itirmək", "vəsiqə", "kayıb", "itki"],
+            "category": "təcili"
+        },
+        {
+            "question": "Xarici pasport üçün hansı sənədlər lazımdır?",
+            "answer": "Xarici pasport üçün:\n- Şəxsiyyət vəsiqəsi\n- 1 ədəd rəngli foto (3.5x4.5)\n- Köhnə xarici pasport (varsa)\n- Rüsum: 45 AZN (ümumi) / 90 AZN (təcili)\nMüddət: 10 iş günü",
+            "keywords": ["xarici", "pasport", "səfər", "viza"],
+            "category": "sənəd"
+        },
+        {
+            "question": "ASAN xidmətin iş saatları necədir?",
+            "answer": "İş saatları:\nBazar ertəsi – Şənbə: 08:00 - 20:00\nBazar: Qapalı\nBayram günlərində fərqli ola bilər.",
+            "keywords": ["iş saatı", "nə vaxt", "açıq", "qrafik"],
+            "category": "ümumi"
+        },
+        {
+            "question": "Ünvan qeydiyyatı (propiska) necə aparılır?",
+            "answer": "Ünvan qeydiyyatı üçün:\n- Şəxsiyyət vəsiqəsi\n- Mənzil sahibinin ərizəsi\n- Mənzilin mülkiyyət sənədi\n- Rüsum: 1 AZN\nMüddət: 3 iş günü",
+            "keywords": ["ünvan", "qeydiyyat", "propiska", "yaşayış"],
+            "category": "sənəd"
+        }
+    ],
+    "dost": [
+        {
+            "question": "DOST mərkəzinə necə yazıla bilərəm?",
+            "answer": "DOST mərkəzinə yazılmaq üçün:\n- dost.gov.az saytından onlayn növbə götürün\n- Və ya ASAN ödəniş terminallarından\n- Qaynar xətt: *1023",
+            "keywords": ["dost", "yazılma", "qeydiyyat", "növbə"],
+            "category": "ümumi"
+        }
+    ],
+    "mygov": [
+        {
+            "question": "MyGov portalında nə etmək olar?",
+            "answer": "MyGov (my.gov.az) ilə:\n- Elektron xidmətlərdən istifadə\n- Sənədlərin statusunu izləmək\n- Ödənişləri onlayn etmək\n- Vətəndaş müraciəti göndərmək",
+            "keywords": ["mygov", "portal", "elektron", "onlayn"],
+            "category": "ümumi"
+        }
+    ]
+}
