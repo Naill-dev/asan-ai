@@ -7,7 +7,7 @@ from datetime import datetime
 import os
 import json
 
-app = Flask(_name_)
+app = Flask(__name__)
 app.config['SECRET_KEY'] = 'asan-chatbot-secret-key-2024'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///asan_chatbot.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
