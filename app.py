@@ -192,10 +192,10 @@ def init_db():
             db.session.commit()
 
 if __name__ == '__main__':
-     with app.app_context():
-        db.create_all()
+        with app.app_context():
+          db.create_all()
         # Default admin yarat
-        if not Admin.query.filter_by(username='admin').first():
+         if not Admin.query.filter_by(username='admin').first():
             admin = Admin(username='admin')
             admin.set_password('admin123')
             db.session.add(admin)
