@@ -190,6 +190,6 @@ def init_db():
             db.session.add(admin)
             db.session.commit()
 
-if __name__ == '_main_':
+if __name__ == '__main__':
     init_db()
     app.run(debug=True, host='0.0.0.0', port=5000)
