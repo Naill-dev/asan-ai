@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASAN AI - Virtual Köməkçi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="chat-wrapper">
+        <div class="chat-container">
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="header-left">
+                    <i class="fas fa-robot robot-icon"></i>
+                    <div class="header-info">
+                        <h2>ASAN AI Assistant</h2>
+                        <span class="status online"><i class="fas fa-circle"></i> Online</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <select id="orgSelector" class="org-select">
+                        <option value="asan_xidmet">🏢 ASAN Xidmət</option>
+                        <option value="dost">🤝 DOST</option>
+                        <option value="mygov">📱 MyGov</option>
+                    </select>
+                    <button class="btn-icon" id="clearChat"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            </div>
+            
+            <!-- Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    <div class="avatar"><i class="fas fa-robot"></i></div>
+                    <div class="message-content">
+                        <div class="message-text">
+                            Salam! Mən ASAN AI köməkçisiyəm. Sizə necə kömək edə bilərəm?
+                        </div>
+                        <span class="message-time">{{ now.strftime('%H:%M') }}</span>
+                    </div>
+                </div>
+                
+                <!-- Quick actions -->
+                <div class="quick-actions">
+                    <button class="quick-btn" data-question="Doğum haqqında şəhadətnamə">📄 Doğum şəhadətnaməsi</button>
+                    <button class="quick-btn" data-question="Şəxsiyyət vəsiqəsi necə dəyişdirilir?">🆔 Şəxsiyyət vəsiqəsi</button>
+                    <button class="quick-btn" data-question="Xarici pasport üçün nə lazımdır?">🌍 Xarici pasport</button>
+                    <button class="quick-btn" data-question="ASAN-ın iş saatları">⏰ İş saatları</button>
+                </div>
+            </div>
+            
+            <!-- Input area -->
+            <div class="chat-input-area">
+                <div class="input-wrapper">
+                    <button class="btn-icon attach"><i class="fas fa-paperclip"></i></button>
+                    <input type="text" id="userInput" placeholder="Mesajınızı yazın..." autocomplete="off">
+                    <button class="btn-icon emoji"><i class="fas fa-smile"></i></button>
+                    <button class="btn-send" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="typing-indicator" id="typingIndicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+    <script>
+        // Chat JavaScript
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const orgSelector = document.getElementById('orgSelector');
+        
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = message ${sender};
+            
+            const time = new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' });
+            
+            if (sender === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="message-content user-content">
+                        <div class="message-text">${text}</div>
+                        <span class="message-time">${time}</span>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="avatar"><i class="fas fa-robot"></i></div>
+                    <div class="message-content">
+                        <div class="message-text">${text.replace(/\n/g, '<br>')}</div>
+                        <span class="message-time">${time}</span>
+                    </div>
+                `;
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            addMessage(message, 'user');
+            userInput.value = '';
+            
+            typingIndicator.style.display = 'flex';
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        message: message,
+                        org_id: orgSelector.value
+                    })
+                });
+                
+                const data = await response.json();
+                typingIndicator.style.display = 'none';
+                addMessage(data.answer, 'bot');
+            } catch (error) {
+                typingIndicator.style.display = 'none';
+                addMessage('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.', 'bot');
+            }
+        }
+        
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        
+        // Quick buttons
+        document.querySelectorAll('.quick-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                userInput.value = btn.dataset.question;
+                sendMessage();
+            });
+        });
+        
+        // Clear chat
+        document.getElementById('clearChat').addEventListener('click', () => {
+            chatMessages.innerHTML = '';
+            addMessage('Salam! Mən ASAN AI köməkçisiyəm. Sizə necə kömək edə bilərəm?', 'bot');
+            
+            // Quick actions-ı yenidən əlavə et
+            const quickActions = document.createElement('div');
+            quickActions.className = 'quick-actions';
+            quickActions.innerHTML = `
+                <button class="quick-btn" data-question="Doğum haqqında şəhadətnamə">📄 Doğum şəhadətnaməsi</button>
+                <button class="quick-btn" data-question="Şəxsiyyət vəsiqəsi necə dəyişdirilir?">🆔 Şəxsiyyət vəsiqəsi</button>
+                <button class="quick-btn" data-question="Xarici pasport üçün nə lazımdır?">🌍 Xarici pasport</button>
+                <button class="quick-btn" data-question="ASAN-ın iş saatları">⏰ İş saatları</button>
+            `;
+            chatMessages.appendChild(quickActions);
+        });
+    </script>
+</body>
+</html>
